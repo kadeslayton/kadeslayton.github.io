@@ -10,6 +10,8 @@
 
 # production
 /build
+/docs
+/dist
 
 # misc
 .DS_Store
@@ -21,3 +23,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+.env
+
+package-lock.json
