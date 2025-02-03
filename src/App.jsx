@@ -10,7 +10,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const functions = getFunctions(app);
 
-export default function Home() {
+export default function App() {
   const [user, setUser] = useState(null);
   const [purchased, setPurchased] = useState(false);
 
@@ -39,11 +39,29 @@ export default function Home() {
   };
 
   const handlePurchase = async () => {
+    if (!user) return alert("Please log in first!");
+  
     const stripe = await stripePromise;
-    const createCheckout = httpsCallable(functions, 'createCheckoutSession');
-    const { data } = await createCheckout({ uid: user.uid });
-    await stripe.redirectToCheckout({ sessionId: data.sessionId });
+    const createCheckout = httpsCallable(functions, "createCheckoutSession");
+    
+    try {
+      const { data } = await createCheckout({ 
+        uid: user.uid, 
+        priceId: "price_1QoDO0LDm40RyVaMejGvr2jU" // Replace with your actual Stripe Price ID
+      });
+  
+      if (data.url) {
+        window.location.href = data.url; // Redirect user to Stripe Checkout
+      } else {
+        console.error("Stripe session URL missing", data);
+        alert("Failed to create checkout session. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error creating Stripe session:", error);
+      alert("Payment failed. Check console for details.");
+    }
   };
+  
 
   return (
     <div>
